@@ -1,0 +1,435 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Manager</title>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+    <style>
+        .form-select {
+            display: block;
+            width: 200px;
+            padding: .375rem 2.25rem .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right .75rem center;
+            background-size: 16px 12px;
+            border: 1px solid #a3a3a3;
+            border-radius: .25rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .managerPopup, .editPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .editPopup input[type="text"], .editPopup select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .saveBT, .managerPopupOKBT {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .saveBT:hover {
+            background-color: #45a049;
+        }
+        .closeBT {
+            position: relative;
+            width: 50px;
+            margin-right: 10%;
+            padding: 10px;
+            background-color: #e92020;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        .closeBT:hover {
+            background-color: #d91a1a;
+        }
+        .overlay, .manager-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        #welcomwA {
+            color: #9974B2;
+            direction: rtl;
+        }
+        .btns {
+            direction: rtl;
+        }
+        #usersTable {
+            direction: rtl;
+        }
+    </style>
+
+    <!-- Ajax Call Script -->
+    <script src="../JS/ajaxCalls.js"></script>
+    <script>
+        let communityList = {};
+        let selectedCommunityIndex = 0;
+        let server = `https://proj.ruppin.ac.il/cgroup62/test2/tar1/api/`;
+
+        $(document).ready(function () {
+            $("#PendingCommunities").on('click', function () {
+                renderAllPendingCommunities();
+            });
+
+            $("#ApprovedCommunities").on('click', function () {
+                renderAllApprovedCommunitiesCommunities();
+            });
+
+            $("#usersTable").on('click', '.ApprovedBtn', function () {
+                let CommunityID = $(this).data('communityid');
+                let apiUpdateStatus = server + 'Communities/UpdateCommunityApprovedStatus';
+
+                let update = {
+                    "communityID": CommunityID,
+                    "approvalStatus": "Approved"
+                };
+
+                ajaxCall("PUT", apiUpdateStatus, JSON.stringify(update), PostSCBAp, PostECBAp);
+            });
+
+            $("#usersTable").on('click', '.RejectedBTN', function () {
+                let CommunityID = $(this).data('communityid');
+                let apiUpdateStatus = server + 'Communities/UpdateCommunityApprovedStatus';
+
+                let update = {
+                    "communityID": CommunityID,
+                    "approvalStatus": "Rejected"
+                };
+
+                ajaxCall("PUT", apiUpdateStatus, JSON.stringify(update), PostSCBreg, PostECBreg);
+            });
+
+            $("#editDiv").hide();
+        });
+
+        function PostSCBAp() {
+            alert('Approved');
+            renderAllPendingCommunities();
+        }
+
+        function PostECBAp(err) {
+            console.log(err);
+        }
+
+        function PostSCBreg() {
+            alert('Rejected');
+            renderAllPendingCommunities();
+        }
+
+        function PostECBreg(err) {
+            console.log(err);
+        }
+
+        function renderAllPendingCommunities() {
+            let api = server + 'Communities/ReadPendingCommunities';
+            ajaxCall("GET", api, "", GetSCB, GetECB);
+        }
+
+        function GetSCB(data) {
+            communityList = data;
+            let strCommunitiesTable = `<thead>
+                <tr>
+                <th>ID</th>
+                <th>שם</th>
+                <th>עיר</th>
+                <th>מיקום</th>
+                <th>תיאור</th>
+                <th>primaryPic</th>
+                <th>status</th>
+                <th></th>
+                </tr>
+                </thead>`;
+            strCommunitiesTable += `<tbody>`;
+
+            for (let i = 0; i < communityList.length; i++) {
+                strCommunitiesTable += `
+                <tr>
+                    <td>${communityList[i].communityId}</td>
+                    <td>${communityList[i].name}</td>
+                    <td>${communityList[i].city}</td>
+                    <td>${communityList[i].location}</td>
+                    <td>${communityList[i].description}</td>
+                    <td><img src="${communityList[i].primaryPic}" alt="Community Image" style="max-width: 100px; height: auto;"></td>
+                    <td class="status" data-userid="${communityList[i].communityId}" data-isactive="true">${communityList[i].status}</td>
+                    <td>
+                        <button type="button" id="${i}" data-communityID="${communityList[i].communityId}" class="btn btn-success ApprovedBtn">אישור</button>
+                        <button type="button" id="${i}" onclick="openManagerPopup(${i})" data-communityid="${communityList[i].communityId}" class="btn-primary btn">מנהל</button>
+                        <button type="button" id="${i}" data-communityID="${communityList[i].communityId}" class="deleteBtn btn-danger btn RejectedBTN">דחייה</button>
+                    </td>
+                </tr>`;
+            }
+
+            strCommunitiesTable += `</tbody>`;
+            $('#usersTable').html(strCommunitiesTable);
+        }
+
+        function GetECB(err) {
+            console.log(err);
+        }
+
+        function renderAllApprovedCommunitiesCommunities() {
+            let api = server + 'Communities/ReadApprovedCommunities';
+            ajaxCall("GET", api, "", GetSCBap, GetECBap);
+        }
+
+        function GetSCBap(data) {
+            communityList = data;
+            let strCommunitiesTable = `<thead>
+                <tr>
+                <th>ID</th>
+                <th>שם</th>
+                <th>עיר</th>
+                <th>מיקום</th>
+                <th>תיאור</th>
+                <th>primaryPic</th>
+                <th>status</th>
+                <th></th>
+                </tr>
+                </thead>`;
+            strCommunitiesTable += `<tbody>`;
+
+            for (let i = 0; i < communityList.length; i++) {
+                strCommunitiesTable += `
+                <tr id="${communityList[i].communityId}">
+                    <td>${communityList[i].communityId}</td>
+                    <td>${communityList[i].name}</td>
+                    <td>${communityList[i].city}</td>
+                    <td>${communityList[i].location}</td>
+                    <td>${communityList[i].description}</td>
+                    <td><img src="${communityList[i].primaryPic}" alt="Community Image" style="max-width: 100px; height: auto;"></td>
+                    <td class="status" data-userid="${communityList[i].communityId}" data-isactive="true">${communityList[i].status}</td>
+                    <td>
+                        <button type="button" id="${i}" onclick="openEditPopup(${i})" data-communityid="${communityList[i].communityId}" class="btn btn-outline-info EditBtn">עריכה</button>
+                        <button type="button" id="${i}" data-communityid="${communityList[i].communityId}" class="deleteBtn btn-danger btn RejectedBTN">מחיקה</button>
+                        <button type="button" id="${i}" onclick="openManagerPopup(${i})" data-communityid="${communityList[i].communityId}" class="btn-primary btn">מנהל</button>
+                    </td>
+                </tr>`;
+            }
+
+            strCommunitiesTable += `</tbody>`;
+            $('#usersTable').html(strCommunitiesTable);
+        }
+
+        function GetECBap(err) {
+            console.log(err);
+        }
+
+        function openManagerPopup(index) {
+            selectedCommunityIndex = index;
+            let api = server + `Communities/ReadCommunityManager?communityID=${communityList[selectedCommunityIndex].communityId}`;
+          
+            ajaxCall("GET", api, "", (managerData)=> {
+                if (managerData.length ==0) {
+                    alert('Manager didn\'t found');
+                    return;
+                }
+                 // Populate manager data into the popup
+                 $('#managerPopup #managerName').text("Full Name: "+managerData[0].firstName + ' ' + managerData[0].lastName);
+                 $('#managerPopup #managerCity').text("City: "+managerData[0].city);
+                 $('#managerPopup #managerPhone').text("Phone: "+managerData[0].phoneNum);
+                 $('#managerPopup #managerDescription').text("Description: "+managerData[0].description);
+                 $('#managerPopup #managerProfilePicture').attr('src', managerData[0].profilePicture);
+
+                document.getElementById("managerPopup").style.display = "block";
+                document.getElementById("manager-popup-overlay").style.display = "block";
+            }, function() {
+                alert('Manager didn\'t found');
+            });
+        }
+
+        function closeManagerPopup() {
+            document.getElementById("managerPopup").style.display = "none";
+            document.getElementById("manager-popup-overlay").style.display = "none";
+        }
+
+        function openEditPopup(index) {
+            selectedCommunityIndex = index;
+            document.getElementById("popup_input_name").value = communityList[index].name;
+            document.getElementById("popup_input_city").value = communityList[index].city;
+            document.getElementById("popup_input_description").value = communityList[index].description;
+            document.getElementById("popup_input_url").value = communityList[index].primaryPic;
+            document.getElementById("editPopup").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function validateImageUrl(url, callback) {
+            const img = new Image();
+            img.onload = function() {
+                callback(true);
+            };
+            img.onerror = function() {
+                callback(false);
+            };
+            img.src = url;
+        }
+
+        function saveChanges() {
+            const primaryPic = document.getElementById("popup_input_url").value;
+
+            validateImageUrl(primaryPic, function(isValid) {
+                if (!isValid) {
+                    alert("Invalid Image URL");
+                    return;
+                }
+
+                const communityId = communityList[selectedCommunityIndex].communityId;
+                const name = document.getElementById("popup_input_name").value;
+                const city = document.getElementById("popup_input_city").value;
+                const description = document.getElementById("popup_input_description").value;
+                const location = communityList[selectedCommunityIndex].location;
+                const status = communityList[selectedCommunityIndex].status;
+
+                const data = {
+                    name,
+                    communityId,
+                    city,
+                    location,
+                    primaryPic,
+                    description,
+                    status
+                };
+
+                document.getElementById("editPopup").style.display = "none";
+                document.getElementById("overlay").style.display = "none";
+
+                let api = server + 'Communities/UpdateCommunityDetails';
+                ajaxCall("PUT", api, JSON.stringify(data), function() {
+                    renderAllApprovedCommunitiesCommunities();
+                    alert('Details Updated');
+                }, function(err) {
+                    console.log(err);
+                    alert('Details Update Failed');
+                });
+            });
+        }
+
+        function closeEditPopup() {
+            document.getElementById("editPopup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 id="welcomwA">שלום לך מנהל!</h1><br><br>
+        <div class="btns">
+            <button type="button" id="PendingCommunities" class="btn btn-outline-primary">קהילות ממתינות</button><br><br>
+            <button type="button" id="ApprovedCommunities" class="btn btn-outline-primary">קהילות שאושרו</button><br><br>
+        </div>
+        <table id="usersTable" class="table table-hover"></table>
+
+        <div id="editDiv">
+            <form id="carForm">
+                <div class="form-group row">
+                    <div class="form-group col-sm-3">
+                        <label for="Name"><span class="red-star">★ </span>Name</label>
+                        <input type="text" class="form-control" id="manufacturer" placeholder="Enter the manufacturer name" required>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="city"><span class="red-star">★ </span>city</label>
+                        <input type="text" class="form-control" id="city" placeholder="Enter the model name" required>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="location"><span class="red-star">★ </span>location</label>
+                        <input type="text" class="form-control" id="location" placeholder="Enter the model name" required>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="form-group col-sm-8">
+                        <label for="description">Description</label>
+                        <textarea rows="6" class="form-control" id="description" placeholder="Enter the description"></textarea>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                        <label for="primaryPic"><span class="red-star">★ </span>primaryPic</label>
+                        <input type="text" class="form-control" id="primaryPic" placeholder="Enter the model name" required>
+                        <img src="images/car.jpg" id="image">
+                    </div>
+                </div><br>
+
+                <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
+                <input type="button" class="btn btn-warning btn-lg" id="cancelSaveBTN" value="Cancel">
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="editPopup" id="editPopup">
+        <div style="top:-30px; left:350px; position: relative;">
+            <button type="button" class="closeBT" aria-label="Close" onclick="closeEditPopup()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <h2>Edit Review</h2>
+        <label for="name">Name:</label>
+        <input type="text" id="popup_input_name" value="">
+        <label for="city">City:</label>
+        <input type="text" id="popup_input_city" value="">
+        <label for="description">Description:</label>
+        <input type="text" id="popup_input_description" value="">
+        <label for="image">Image URL:</label>
+        <input type="text" id="popup_input_url" value="">
+        <button class="saveBT" onclick="saveChanges()">Save</button>
+    </div>
+
+    <!-- Manager Popup -->
+    <div class="manager-popup-overlay" id="manager-popup-overlay"></div>
+    <div class="managerPopup" id="managerPopup">
+        <h2>Manager Information</h2>
+        <img id="managerProfilePicture" src="" alt="Profile Picture">
+        <p id="managerName"></p>
+        <p id="managerCity"></p>
+        <p id="managerPhone"></p>
+        <p id="managerDescription"></p>
+        <button class="managerPopupOKBT" onclick="closeManagerPopup()">OK</button>
+    </div>
+</body>
+</html>
