@@ -1,0 +1,134 @@
+/* REGISTERSTYLE.css */
+
+/* Remove underline under TextField in normal, enter, and hover modes */
+.inpYellow .MuiInput-underline:not(.Mui-disabled):before,
+.inpYellow .MuiInput-underline:not(.Mui-disabled):after,
+.inpYellow .MuiInput-underline:hover:not(.Mui-disabled):before,
+.inpYellow .MuiInput-underline:hover:not(.Mui-disabled):after,
+.inpAboutClass .MuiInput-underline:not(.Mui-disabled):before,
+.inpAboutClass .MuiInput-underline:not(.Mui-disabled):after,
+.inpAboutClass .MuiInput-underline:hover:not(.Mui-disabled):before,
+.inpAboutClass .MuiInput-underline:hover:not(.Mui-disabled):after {
+    border-bottom: none;
+}
+
+/* Default styles */
+
+.inpYellow {
+    background-color: #DABB80;
+    opacity: 50%;
+    color: black;
+    direction: rtl;
+    border-radius: 30px;
+}
+
+/* Text input styles */
+.inpYellow .MuiInputBase-input {
+    text-indent: 15%;
+}
+
+/* Label styles for normal mode */
+.inpYellow .MuiInputLabel-root,
+.inpAboutClass .MuiInputLabel-root {
+    font-size: 14px;
+    position: absolute;
+    top: 30%;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    transform: translateX(-25%);
+    font-weight: bolder;
+    border-color: black;
+}
+
+/* Label styles for hover mode */
+.inpYellow:hover .MuiInputLabel-root,
+.inpAboutClass:hover .MuiInputLabel-root {
+    color: black;
+}
+
+/* Label styles for enter mode */
+.inpYellow .MuiInputLabel-shrink {
+    transform: translateY(-95%) scale(1);
+    color: black;
+    font-weight: bolder;
+}
+
+/* Label styles for focused mode */
+.inpYellow .MuiInputLabel-root.Mui-focused,
+.inpAboutClass .MuiInputLabel-root.Mui-focused {
+    color: black;
+}
+
+/* Select styles */
+.selectYellow {
+    background-color: #DABB80;
+    opacity: 50%;
+    color: black;
+    border-radius: 30px;
+    width: 51%;
+    height: 47px;
+}
+
+#inpAboutYellow {
+    border: #DABB80 1px solid;
+    border-radius: 30px;
+    /* margin-bottom: 20%; */
+    margin-top: 1%;
+    width: 100%;
+    padding: 15px;
+    color: black;
+    direction: rtl;
+}
+
+#inpAboutPurple {
+    border: #9274B2 1px solid;
+    border-radius: 30px;
+    /* margin-bottom: 20%; */
+    margin-top: 1%;
+    width: 100%;
+    padding: 15px;
+    color: black;
+    direction: rtl;
+}
+
+/* Label styles for enter mode */
+.inpYellow .MuiInputLabel-shrink {
+    transform: translateY(-100%) scale(1);
+    color: black;
+    font-weight: 400;
+}
+
+.MuiInputLabel-root {
+    transform: translateX(18%);
+}
+
+.inpAboutClass .MuiInputLabel-shrink {
+    transform: translateY(-55%) scale(1);
+    color: black;
+    font-weight: 400;
+}
+
+.errorMessage {
+    color: crimson;
+}
+
+/* buttons styles */
+#btnToNextLevelPurple {
+    background-color: #9274B2;
+    color: white;
+    border-radius: 18px;
+    width: 24%;
+
+    margin-top: 2%;
+    margin-bottom: 25%;
+}
+
+#btnToRegYellow {
+    background-color: #DABB80;
+    color: black;
+    border-radius: 18px;
+    width: 20%;
+    margin-top: 2%;
+    margin-bottom: 25%;
+}

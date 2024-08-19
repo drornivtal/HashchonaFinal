@@ -1,0 +1,47 @@
+/* ---NewRequestStyles--- */
+#inpRequestDiscription {
+    border: #9274B2 2px solid;
+    border-radius: 20px;
+    width: 50vw;
+    padding: 15px;
+    padding-bottom: 60px;
+    color: black;
+    direction: rtl;
+    font-size: 14px;
+    /* font-family: 'Varela Round' */
+    
+}
+#inpEditRequestDiscription {
+    border: #DABB80 2px solid;
+    border-radius: 20px;
+    /* width: 35vw; */
+    width: 50vw;
+    padding: 15px;
+    padding-bottom: 60px;
+    color: black;
+    direction: rtl;
+    font-size: 14px;
+    /* font-family: 'Varela Round' */
+
+}
+
+#btnCreateNewRequest {
+    background-color: #9274B2;
+    color: white;
+    border-radius: 18px;
+    width: 29%;
+    margin-top: -5%;
+    margin-bottom: 1%;
+    /* font-family: 'Varela Round' */
+  
+}
+#btnEditRequest {
+    background-color:  #DABB80;
+    color: black;
+    border-radius: 18px;
+    width: 29%;
+    margin-top: -5%;
+    margin-bottom: 1%;
+    /* font-family: 'Varela Round' */
+
+}
